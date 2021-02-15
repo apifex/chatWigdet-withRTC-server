@@ -19,6 +19,10 @@ const io = new socketIo.Server(httpServer, {
     }
   })
 
+server.get('/admin', (req, res) => {
+  res.send('server works')
+  // res.sendFile(__dirname + '/admin.html')
+})
 
 
 // const save = async () => {
