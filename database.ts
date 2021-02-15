@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 interface IChat {
     userName: String,
     conversation: {
-            me: boolean,
+            isUser: boolean,
             msg: String,
             timestamp: String
         }[],
