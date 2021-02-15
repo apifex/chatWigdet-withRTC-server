@@ -33,11 +33,16 @@ const io = socketIo(httpServer, {
 
 
 server.get('/admin', (req, res) => {
-  res.send('server works')
+  res.send(io)
+  
   // res.sendFile(__dirname + '/admin.html')
 })
 
-
+server.get('/', (req, res) => {
+    res.send('server works')
+    
+    // res.sendFile(__dirname + '/admin.html')
+  })
 // const save = async () => {
 // const chatshistory = SaveChat.build({
 //     userName: "mietek",
@@ -112,7 +117,7 @@ const bots: bot[] = [
  conversation: []}
 ]
 
-io.on("connection", (socket:any) => {
+io.on("connection", (socket: any) => {
     console.log("New client connected: ", socket.id);
 
     socket.on('message', (msg: string, id:string) => {
