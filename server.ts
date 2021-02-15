@@ -1,12 +1,15 @@
 import 'dotenv/config'
-import express from 'express'
-import {createServer} from 'http'
+// import express from 'express'
+// import {createServer} from 'http'
 // import bodyParser from 'body-parser'
-const bodyParser= require('body-parser')
-import cors from 'cors'
-import {Server} from 'socket.io'
-// const socketIo = require("socket.io");
+// import cors from 'cors'
+// import {Server} from 'socket.io'
+const socketIo = require("socket.io");
 // const http = require("http");
+const express = require("express");
+const http = require("http");
+const bodyParser = require('body-parser')
+
 import TelegramBot from 'node-telegram-bot-api'
 
 import {SaveChat} from './database'
@@ -16,31 +19,27 @@ const port = process.env.PORT || 4000
 const server = express()
 server.use(bodyParser.json())
 // server.use(cors())
-const httpServer = createServer(server)
+const httpServer = http.createServer(server)
 
 
-const io = new Server(httpServer, {
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
-    }
-  })
-
-// const io = socketIo(httpServer, {
+// const io = new Server(httpServer, {
 //     cors: {
-//         origin: "*:*",
-//         methods: ["GET", "POST"]
+//       origin: "*:*",
+//       methods: ["GET", "POST"]
 //     }
-// })
+//   })
 
-
-server.get('/admin', (req, res) => {
-  res.send(io)
-  
-  // res.sendFile(__dirname + '/admin.html')
+const io = socketIo(httpServer, {
+    cors: {
+        origin: "*:*",
+        methods: ["GET", "POST"]
+    }
 })
 
-server.get('/', (req, res) => {
+
+
+
+server.get('/', (req:any, res:any) => {
     res.send('server works')
     
     // res.sendFile(__dirname + '/admin.html')
