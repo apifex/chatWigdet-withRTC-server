@@ -4,6 +4,7 @@ import {createServer} from 'http'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import {Server} from 'socket.io'
+const socketIo = require("socket.io");
 import TelegramBot from 'node-telegram-bot-api'
 
 import {SaveChat} from './database'
@@ -16,12 +17,20 @@ server.use(cors())
 const httpServer = createServer(server)
 
 
-const io = new Server(httpServer, {
+// const io = new Server(httpServer, {
+//     cors: {
+//       origin: "*",
+//       methods: ["GET", "POST"]
+//     }
+//   })
+
+const io = socketIo(httpServer, {
     cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
+        origin: "*:*",
+        methods: ["GET", "POST"]
     }
-  })
+})
+
 
 server.get('/admin', (req, res) => {
   res.send('server works')
