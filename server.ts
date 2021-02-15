@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
-import http from 'http'
+import {createServer} from 'http'
 import bodyParser from 'body-parser'
 import {Server} from 'socket.io'
 import TelegramBot from 'node-telegram-bot-api'
@@ -11,7 +11,7 @@ const port = process.env.PORT || 4000
 
 const server = express()
 server.use(bodyParser.json())
-const httpServer = http.createServer(server)
+const httpServer = createServer(server)
 
 const io = new Server(httpServer, {
     cors: {
