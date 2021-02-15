@@ -22,7 +22,7 @@ server.get('/test', (req:any, res:any) => {
 })
 
 server.get('/admin', (req:any, res:any) => {
-    res.sendFile(__dirname + 'admin_page/admin.html')
+    res.sendFile(__dirname + '/admin_page/admin.html')
 })
 
 if (!process.env.TELEGRAM_TOKEN_1) throw Error
@@ -65,22 +65,31 @@ const bots: bot[] = [
  conversation: []}
 ]
 
+interface IWaitingConnections {
+    id: string,
+    msgs: string[],
+}
+
+
+const waitingConnections: IWaitingConnections[] = new Array
+
 io.on("connection", (socket: Socket) => {
     console.log("New client connected: ", socket.id);
 
     socket.on('message', (msg: string, id:string) => {
       if (!process.env.TELEGRAM_ID) throw Error
-      let isFirst = true
+      let isFirstConnection = true
       for (let x in bots) {
         if (bots[x].clientId === id) {
           bots[x].bot.sendMessage(process.env.TELEGRAM_ID, msg)
           bots[x].conversation.push({isUser: true, msg: msg, timestamp: new Date().getTime().toString()})
-          isFirst = false
+          isFirstConnection = false
           break;
         }
       }
       
-      if (isFirst) {
+      if (isFirstConnection) {
+        let isBotLinked = false;
         for(let x in bots) {
           if (!bots[x].active) {
             bots[x].active = true;
@@ -88,10 +97,21 @@ io.on("connection", (socket: Socket) => {
             bots[x].bot.sendMessage(process.env.TELEGRAM_ID, "### New conversation ### ")
             bots[x].bot.sendMessage(process.env.TELEGRAM_ID, msg)
             bots[x].conversation.push({isUser: true, msg: msg, timestamp: new Date().getTime().toString()})
+            isBotLinked = true
             break;
-          
-            //TODO logic to WAIT when there is no availble bots
           }
+        }
+        if (!isBotLinked) {
+            let isWaiting = waitingConnections.find(el => el.id === id)
+            if (isWaiting) {
+                isWaiting.msgs.push(msg)
+            } else {
+                waitingConnections.push({id, msgs:[msg]})
+                io.to(id).emit('response', "Niestety czas oczekiwania na rozmowę może się przedłużyć... możesz zaczekać, albo zostawić nam swojego maila na którego na pewno odpowiemy")
+            }
+            
+            
+            
         }
       }
     })
@@ -106,9 +126,17 @@ socket.on('disconnect', ()=>{
                conversation: bots[x].conversation
               }).save();
           bots[x].conversation = [];
-          bots[x].active = false;
           bots[x].clientId = ''
           bots[x].bot.sendMessage(process.env.TELEGRAM_ID, "### User disconnected ###")
+          if (waitingConnections.length>0) {
+              let waitingClient = waitingConnections.shift() 
+              if (!waitingClient) return
+              bots[x].clientId = waitingClient.id
+              bots[x].bot.sendMessage(process.env.TELEGRAM_ID, "### User connected ###")
+              //@ts-ignore // why process.env.TELEGR is no longer valid???
+              waitingClient.msgs.forEach(msg => bots[x].bot.sendMessage(process.env.TELEGRAM_ID, msg))
+            }
+          bots[x].active = false;
           break;
           }
         } 
