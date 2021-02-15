@@ -18,7 +18,7 @@ const httpServer = createServer(server)
 
 const io = new Server(httpServer, {
     cors: {
-      origin: "*:*",
+      origin: "*",
       methods: ["GET", "POST"]
     }
   })
