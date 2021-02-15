@@ -2,7 +2,7 @@
   "name": "chatwidget_server",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/server.js",
+  "main": "dist/server.js",
   "scripts": {
     "start": "tsc && node ./dist/server.js",
     "postinstall": "tsc"
