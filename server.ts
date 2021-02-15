@@ -12,7 +12,8 @@ const port = process.env.PORT || 4000
 const server = express()
 server.use(bodyParser.json())
 const httpServer = http.createServer(server)
-const io = new socketIo.Server(httpServer, {
+
+const io = socketIo.Socket.arguments(httpServer, {
     cors: {
       origin: "*:*",
       methods: ["GET", "POST"]
