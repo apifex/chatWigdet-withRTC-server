@@ -29,7 +29,7 @@ server.post('/settings', (req: any, res:any)=>{
 })
 
 server.post('/getchats', (req:any, res: any)=>{
-  getAllChats.then(chats=>{
+  ChatModel.find().then(chats=>{
     res.send(JSON.stringify(chats))})
 })
 
@@ -66,7 +66,7 @@ const startSocket = () => {
           if (!bots[x].isBusy) {
             bots[x].isBusy = true;
             bots[x].clientId = id;
-            bots[x].chatStartTime = new Date().toString(),
+            bots[x].chatStartTime = new Date().toUTCString(),
             bots[x].bot.sendMessage(TELEGRAM_ID, "### New conversation ### ")
             bots[x].bot.sendMessage(TELEGRAM_ID, msg)
             bots[x].conversation.push({isUser: true, msg: msg, timestamp: new Date().getTime().toString()})
@@ -154,4 +154,4 @@ const startBotsListen = () => {
     })
 }
   
-httpServer.listen(port);
+httpServer.listen(port, ()=>console.log(`listening on port${port}`));
