@@ -23,10 +23,13 @@ const io = new Server(httpServer, { cors: { origin: "*:*",
 server.get('/test', (req:any, res:any) => {
     res.send('server works')
 })
+server.get('/telegramusername', async (req:any, res:any) => {
+  const telegramUsername = await SettingsModel.find().then((sets)=>sets[0].telegramUsername)
+  res.send(JSON.stringify(telegramUsername))  
+  })
 
 server.get('/whatsapp', async (req:any, res:any) => {
-  const whatsapp = await SettingsModel.find().then((sets)=>
-  {return sets[0].whatsapp1})
+  const whatsapp = await SettingsModel.find().then((sets)=>sets[0].whatsapp1)
   res.send(JSON.stringify(whatsapp))  
   })
 

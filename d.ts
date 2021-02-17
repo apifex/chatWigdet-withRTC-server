@@ -16,6 +16,7 @@ interface ISettings {
     token_4: String,
     token_5: String,
     whatsapp1: String,
+    telegramUsername: String
 }
 
 interface IWaitingConnections {

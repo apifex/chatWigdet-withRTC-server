@@ -60,12 +60,16 @@ const settingsSchema = new mongoose.Schema({
     },
     whatsapp1: {
         type: String,
-        required: false
+        required: true
     },
     whatsapp2: {
         type: String,
         required: false
     },
+    telegramUsername: {
+        type: String,
+        required: true
+    }
 })
 
 settingsSchema.statics.build = (args: ISettings) => {

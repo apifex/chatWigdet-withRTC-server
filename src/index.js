@@ -20,6 +20,7 @@ settingsForm.addEventListener('submit', (event)=> {
   token_3: settingsForm.elements['token3'].value,
   token_4: settingsForm.elements['token4'].value,
   token_5: settingsForm.elements['token5'].value,
+  telegramUsername: settingsForm.elements['telegram_username'].value,
   whatsapp1: settingsForm.elements['whatsapp1'].value}
 
   fetch('https://widgettelegram-server.azurewebsites.net/settings',
