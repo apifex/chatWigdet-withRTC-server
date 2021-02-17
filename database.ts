@@ -1,17 +1,12 @@
 import 'dotenv/config'
 import mongoose from 'mongoose'
 
-interface IChat {
-    userName: String,
-    conversation: {
-            isUser: boolean,
-            msg: String,
-            timestamp: String
-        }[],
+interface ChatModelInterface extends mongoose.Model<any> {
+    build(args: IChat): any
 }
 
-interface saveChatInterface extends mongoose.Model<any> {
-    build(args: IChat): any
+interface SettingsModelInterface extends mongoose.Model<any> {
+    build(args: ISettings): any
 }
 
 if (!process.env.MONGOURL) throw Error
@@ -20,11 +15,11 @@ mongoose.connect(process.env.MONGOURL,
     useNewUrlParser: true,
     useUnifiedTopology: true,
     },
-    ()=> console.log("connected to MongoDB")
+    // ()=> console.log("connected to MongoDB")
     )
 
 const chatSchema = new mongoose.Schema({
-    userName: {
+    chatID: {
         type: String,
         required: true
     },
@@ -35,7 +30,59 @@ const chatSchema = new mongoose.Schema({
 })
 
 chatSchema.statics.build = (args: IChat) => {
-    return new SaveChat(args)
+    return new ChatModel(args)
 }
 
-export const SaveChat = mongoose.model<any, saveChatInterface>('Chat', chatSchema)
+const settingsSchema = new mongoose.Schema({
+    telegram_id: {
+        type: String,
+        required: true
+    },
+    token_1: {
+        type: String,
+        required: true
+    },
+    token_2: {
+        type: String,
+        required: true
+    },
+    token_3: {
+        type: String,
+        required: true
+    },
+    token_4: {
+        type: String,
+        required: true
+    },
+    token_5: {
+        type: String,
+        required: true
+    },
+    whatsapp1: {
+        type: String,
+        required: false
+    },
+    whatsapp2: {
+        type: String,
+        required: false
+    },
+})
+
+settingsSchema.statics.build = (args: ISettings) => {
+    return new SettingsModel(args)
+}
+
+
+
+export const SettingsModel = mongoose.model<any, SettingsModelInterface>('Settings', settingsSchema)
+export const ChatModel = mongoose.model<any, ChatModelInterface>('Chat', chatSchema)
+export const getAllChats = ChatModel.find().exec()
+export const getSettings = SettingsModel.find().exec()
+export const updateSettings = async (newSettings:ISettings) => {
+    const settings = await SettingsModel.findOne()
+    settings.overwrite(newSettings)
+    await settings.save()
+    
+}
+
+

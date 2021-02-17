@@ -1,0 +1,222 @@
+
+.main {
+	display: none;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+
+.container {
+	width: auto;
+	padding:30px;
+	margin:20px;
+	background: #FFF;
+	border-radius: 10px;
+	-webkit-border-radius:10px;
+	-moz-border-radius: 10px;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
+	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
+	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
+}
+
+.container h1{
+	background: #2A88AD;
+	padding: 20px 30px 15px 30px;
+	margin: -30px -30px 30px -30px;
+	border-radius: 10px 10px 0 0;
+	-webkit-border-radius: 10px 10px 0 0;
+	-moz-border-radius: 10px 10px 0 0;
+	color: #fff;
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);
+	font: normal 30px 'Bitter', serif;
+	-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	border: 1px solid #257C9E;
+}
+.container h1 > span{
+	display: block;
+	margin-top: 2px;
+	font: 13px Arial, Helvetica, sans-serif;
+}
+
+.container h3{
+	background: #2A88AD;
+	padding: 10px 15px 8px 15px;
+	margin: -30px -30px 30px -30px;
+	border-radius: 10px 10px 0 0;
+	-webkit-border-radius: 10px 10px 0 0;
+	-moz-border-radius: 10px 10px 0 0;
+	color: #fff;
+	text-align: center;
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);
+	font: normal 20px 'Bitter', serif;
+	-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	border: 1px solid #257C9E;
+}
+
+.container label{
+	display: block;
+	font: 13px Arial, Helvetica, sans-serif;
+	color: #888;
+	margin-bottom: 15px;
+}
+.container input[type="text"],
+.container input[type="date"],
+.container input[type="datetime"],
+.container input[type="email"],
+.container input[type="number"],
+.container input[type="search"],
+.container input[type="time"],
+.container input[type="url"],
+.container input[type="password"],
+.container textarea,
+.container select {
+	display: block;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	width: 100%;
+	padding: 8px;
+	border-radius: 6px;
+	-webkit-border-radius:6px;
+	-moz-border-radius:6px;
+	border: 2px solid #fff;
+	box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.33);
+	-moz-box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.33);
+	-webkit-box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.33);
+}
+
+.container input[type="button"], 
+.container input[type="submit"]{
+	background: #2A88AD;
+	padding: 8px 20px 8px 20px;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	color: #fff;
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);
+	font: normal 30px 'Bitter', serif;
+	-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.17);
+	border: 1px solid #257C9E;
+	font-size: 15px;
+}
+.container input[type="button"]:hover, 
+.container input[type="submit"]:hover{
+	background: #2A6881;
+	-moz-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.28);
+	-webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.28);
+	box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.28);
+}
+
+.status {
+	display: inline-block;
+	padding: 8px 20px 8px 20px;
+	font-size: 15px;
+	color: rgb(240, 89, 89);
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.12);
+	font: normal 20px 'Bitter', serif;
+}
+
+.listHistory {
+	color: rgb(145, 145, 255);
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.12);
+	font: normal 20px 'Bitter', serif;
+	cursor: pointer;
+	padding-top: 5px;
+	list-style: none;
+}
+
+.messages {
+	max-height: 80vh;
+	overflow-y: scroll;
+	position: relative;
+	width: auto;
+	padding: 10px;
+	background-color: rgb(252, 252, 252);
+	border-radius: 5px;
+	/* border: solid;
+	border-color: coral; */
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
+	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
+	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
+}
+	
+.message {
+	  clear: both;
+	  float: left;
+	  padding: 6px 8px 7px;
+	  border-radius: 15px 10px 10px 0;
+	  background: rgb(223, 223, 223);
+	  margin: 8px 0;
+	  font-size: 14px;
+	  line-height: 1.4;
+	  margin-left: 5px;
+	  position: relative;
+	  border:1px solid #ccc;
+}
+.timestamp {
+		position: absolute;
+		bottom: -15px;
+		font-size: 9px;
+		color: rgba(255, 255, 255, .3);
+	  }
+	  
+.message-personal {
+		float: right;
+		background: rgb(248, 248, 248);
+		border:1px solid #ccc;
+		text-align: right;
+		border-radius: 10px 15px 0 10px;
+}
+.message-personal::before {
+		  left: auto;
+		  right: 0;
+		  border-right: none;
+		  bottom: -4px;
+		}
+	  
+	  
+.new {
+		transform: scale(0);
+		transform-origin: 0 0;
+		animation: bounce 500ms linear both;
+	  }
+
+
+.login {
+	display: block;
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin-right: -50%;
+    transform: translate(-50%, -50%);
+	width: 30vw;
+	min-width: 200px;
+	max-width: 300px;
+}
+  
+  /* Works on Firefox */
+  * {
+	scrollbar-width: thin;
+	scrollbar-color: rgb(119, 119, 119) rgba(37, 36, 36, 0.658);
+  }
+  
+  /* Works on Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+	width: 5px;
+  }
+  
+  *::-webkit-scrollbar-track {
+	background: transparent;
+  }
+  
+  
+  *::-webkit-scrollbar-thumb {
+	background-color: rgba(37, 36, 36, 0.658);
+	border-radius: 20px;
+	border: 1px solid rgb(119, 119, 119);
+  }
