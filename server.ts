@@ -22,7 +22,7 @@ server.get('/test', (req:any, res:any) => {
     res.send('server works')
 })
 
-server.post('/whatsapp', async (req:any, res:any) => {
+server.get('/whatsapp', async (req:any, res:any) => {
   const whatsapp = await SettingsModel.find().then((sets)=>
   {return sets[0].whatsapp1})
   res.send(JSON.stringify(whatsapp))  
