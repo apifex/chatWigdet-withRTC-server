@@ -4,7 +4,7 @@ import path from 'path'
 import {createServer} from 'http'
 import bodyParser from 'body-parser'
 import {Server, Socket} from 'socket.io'
-import {ChatModel, SettingsModel, getAllChats, updateSettings} from './database'
+import {ChatModel, SettingsModel, updateSettings} from './database'
 import {startBots, IBot} from './telegramBots'
 
 // start server
@@ -13,7 +13,7 @@ const server = express()
 server.use(bodyParser.json())
 server.use('/admin', express.static(path.join(__dirname, 'dist')))
 const httpServer = createServer(server)
-export const io = new Server(httpServer, { cors: { origin: "*:*",
+const io = new Server(httpServer, { cors: { origin: "*:*",
                                         methods: ["GET", "POST"]}
                                   })
 
@@ -21,6 +21,13 @@ export const io = new Server(httpServer, { cors: { origin: "*:*",
 server.get('/test', (req:any, res:any) => {
     res.send('server works')
 })
+
+server.post('/whatsapp', async (req:any, res:any) => {
+  const whatsapp = await SettingsModel.find().then((sets)=>
+  {return sets[0].whatsapp1})
+  res.send(JSON.stringify(whatsapp))  
+  })
+
 
 //endpoints
 server.post('/settings', (req: any, res:any)=>{

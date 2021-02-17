@@ -13,7 +13,7 @@ if (!process.env.MONGOURL) throw Error
 mongoose.connect(process.env.MONGOURL, 
     {useCreateIndex: true,
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true
     },
     // ()=> console.log("connected to MongoDB")
     )
@@ -76,13 +76,11 @@ settingsSchema.statics.build = (args: ISettings) => {
 
 export const SettingsModel = mongoose.model<any, SettingsModelInterface>('Settings', settingsSchema)
 export const ChatModel = mongoose.model<any, ChatModelInterface>('Chat', chatSchema)
-export const getAllChats = ChatModel.find().exec()
-export const getSettings = SettingsModel.find().exec()
+
 export const updateSettings = async (newSettings:ISettings) => {
     const settings = await SettingsModel.findOne()
     settings.overwrite(newSettings)
     await settings.save()
-    
 }
 
 

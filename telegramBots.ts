@@ -1,5 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api'
-import {getSettings} from './database'
+import {SettingsModel} from './database'
 
 export interface IBot {
     bot: TelegramBot,
@@ -16,7 +16,7 @@ export interface IBot {
 export const startBots = async () => {
     let TELEGRAM_ID = ''
     const bots: IBot[] = new Array
-    await getSettings.then((sets)=>{
+    await SettingsModel.find().then((sets)=>{
             TELEGRAM_ID = sets[0].telegram_id
             bots.push({bot: new TelegramBot(sets[0].token_1, {polling: true}),
              isBusy: false,
