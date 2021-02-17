@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import path from 'path'
+import cors from 'cors'
 import {createServer} from 'http'
 import bodyParser from 'body-parser'
 import {Server, Socket} from 'socket.io'
@@ -10,6 +11,7 @@ import {startBots, IBot} from './telegramBots'
 // start server
 const port = process.env.PORT || 4000
 const server = express()
+server.use(cors())
 server.use(bodyParser.json())
 server.use('/admin', express.static(path.join(__dirname, 'dist')))
 const httpServer = createServer(server)
