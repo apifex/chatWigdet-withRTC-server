@@ -22,7 +22,7 @@ settingsForm.addEventListener('submit', (event)=> {
   token_5: settingsForm.elements['token5'].value,
   whatsapp1: settingsForm.elements['whatsapp1'].value}
 
-  fetch('http://localhost:4001/settings',
+  fetch('https://widgettelegram-server.azurewebsites.net/settings',
         {headers: {'Content-Type': 'application/json'}, 
         method: "POST",
         body: JSON.stringify(settings)
@@ -36,7 +36,7 @@ settingsForm.addEventListener('submit', (event)=> {
 let chatsHistory = []
 const fetchChatsHistory = async () => {
     const chats = await fetch(
-        'http://localhost:4001/getchats',
+        'https://widgettelegram-server.azurewebsites.net/getchats',
         {headers: {'Content-Type': 'application/json'}, method: "POST"}
     );
     chatsHistory = await chats.json()  
