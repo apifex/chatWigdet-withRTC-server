@@ -58,9 +58,9 @@
 
 .container label{
 	display: block;
-	font: 13px Arial, Helvetica, sans-serif;
+	font: 12px Arial, Helvetica, sans-serif;
 	color: #888;
-	margin-bottom: 15px;
+	margin-bottom: 12px;
 }
 .container input[type="text"],
 .container input[type="date"],
@@ -78,7 +78,7 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	width: 100%;
-	padding: 8px;
+	padding: 6px;
 	border-radius: 6px;
 	-webkit-border-radius:6px;
 	-moz-border-radius:6px;
@@ -124,10 +124,12 @@
 .listHistory {
 	color: rgb(145, 145, 255);
 	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.12);
-	font: normal 20px 'Bitter', serif;
+	font: normal 16px 'Bitter', serif;
 	cursor: pointer;
 	padding-top: 5px;
 	list-style: none;
+}:hover{
+	color: rgb(255, 47, 47);
 }
 
 .messages {
@@ -138,8 +140,6 @@
 	padding: 10px;
 	background-color: rgb(252, 252, 252);
 	border-radius: 5px;
-	/* border: solid;
-	border-color: coral; */
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
 	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);
 	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.13);

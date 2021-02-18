@@ -12,6 +12,8 @@ import {startBots, IBot} from './telegramBots'
 // - obługa błędów... zwłaszcza w telegramBots.ts i database.ts
 // - system do zapisu/wyświetlania logów
 // - potwierdzenie dostarczenia wiadomości
+// - 'pamietanie' logowania strony admin (cookies? czy localstorage?)
+// - usuwanie historii czatów z bazy danych ze strony admina
 // - szyfrowanie wiadomości (o ile ma sens)??
 
 // start server
@@ -50,6 +52,7 @@ server.post('/settings', endpointsErrorHandlar, async (req: Request, res: Respon
   }
 })
 
+
 server.post('/getchats', endpointsErrorHandlar, (req: Request, res: Response)=> {
   ChatModel.find().then(
     chats=>{res.send(JSON.stringify(chats))}, 
@@ -69,7 +72,6 @@ server.get('/getwhatsappnumber', endpointsErrorHandlar ,async (req: Request, res
     ()=> {throw new Error('could not get whatsappNumber from database')})
   res.send(JSON.stringify(whatsapp))  
   })
-
   
 //services
 let TELEGRAM_ID = ''
@@ -83,12 +85,8 @@ startBots().then(bot => {
     startBotsListen()
   }).catch(error=>console.log('error', error)) // TODO: zmienić sposób obsługi błędu
 
-
-
 const startSocket = () => {
-    
     io.on("connection", (socket: Socket) => {
-
     const waitingConnections: IWaitingConnections[] = new Array
     socket.on('message', (msg: string, id:string) => {
       let isFirstConnection = true
