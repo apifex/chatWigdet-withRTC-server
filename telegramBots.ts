@@ -43,7 +43,7 @@ export const startBots = async () => {
              clientId: '',
              chatStartTime: '',
              conversation: []})
-    })
+        })
     return {bots, TELEGRAM_ID}
 }
   

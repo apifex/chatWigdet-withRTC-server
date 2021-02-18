@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import express from 'express'
+import express, {NextFunction, Request, Response} from 'express'
 import path from 'path'
 import cors from 'cors'
 import {createServer} from 'http'
@@ -8,43 +8,69 @@ import {Server, Socket} from 'socket.io'
 import {ChatModel, SettingsModel, updateSettings} from './database'
 import {startBots, IBot} from './telegramBots'
 
+//TODO :
+// - obługa błędów... zwłaszcza w telegramBots.ts i database.ts
+// - system do zapisu/wyświetlania logów
+// - potwierdzenie dostarczenia wiadomości
+// - szyfrowanie wiadomości (o ile ma sens)??
+
 // start server
 const port = process.env.PORT || 4000
 const server = express()
-server.use(cors())
-server.use(bodyParser.json())
-server.use('/admin', express.static(path.join(__dirname, 'dist')))
+  server.use(cors())
+  server.use(bodyParser.json())
+  server.use('/admin', express.static(path.join(__dirname, 'dist')))
+
 const httpServer = createServer(server)
 const io = new Server(httpServer, { cors: { origin: "*:*",
                                         methods: ["GET", "POST"]}
                                   })
 
-//test TO DELETE!!
-server.get('/test', (req:any, res:any) => {
-    res.send('server works')
+
+//endpoints
+const endpointsErrorHandlar = (req: Request, res: Response, next: NextFunction) => {
+  try{
+    return next ()
+  } catch ({message}) {
+    res.status(500).send({error: true, message})
+  }
+}
+server.get('/status', endpointsErrorHandlar, (req:any, res:any) => {
+  res.send('server works')
 })
-server.get('/telegramusername', async (req:any, res:any) => {
-  const telegramUsername = await SettingsModel.find().then((sets)=>sets[0].telegramUsername)
+
+server.post('/settings', endpointsErrorHandlar, async (req: Request, res: Response)=>{
+  const settings = await SettingsModel.findOne()
+  if (settings !== null) {
+    updateSettings(req.body).then(()=> res.send('settings updated'), 
+    ()=> {throw new Error('could not update settings in database')})
+  } else {
+    SettingsModel.build(req.body).save().then(()=> res.send('settings saved'),
+    ()=> {throw new Error('could not save settings in database')})
+  }
+})
+
+server.post('/getchats', endpointsErrorHandlar, (req: Request, res: Response)=> {
+  ChatModel.find().then(
+    chats=>{res.send(JSON.stringify(chats))}, 
+    () => {throw new Error('could not find chats in database')})
+})
+
+server.get('/gettelegramusername', endpointsErrorHandlar , async (req: Request, res: Response) => {
+  const telegramUsername = await SettingsModel.find().then(
+    (sets)=>sets[0].telegramUsername, 
+    ()=> {throw new Error('could not get telegramUserName from database')})
   res.send(JSON.stringify(telegramUsername))  
   })
 
-server.get('/whatsapp', async (req:any, res:any) => {
-  const whatsapp = await SettingsModel.find().then((sets)=>sets[0].whatsapp1)
+server.get('/getwhatsappnumber', endpointsErrorHandlar ,async (req: Request, res: Response) => {
+  const whatsapp = await SettingsModel.find().then(
+    (sets)=>sets[0].whatsapp1, 
+    ()=> {throw new Error('could not get whatsappNumber from database')})
   res.send(JSON.stringify(whatsapp))  
   })
 
-
-//endpoints
-server.post('/settings', (req: any, res:any)=>{
-  updateSettings(req.body).then(()=>res.send('dobrze'))
-  // SettingsModel.build(req.body).save().then(res.send('ok'))
-})
-
-server.post('/getchats', (req:any, res: any)=>{
-  ChatModel.find().then(chats=>{
-    res.send(JSON.stringify(chats))})
-})
-
+  
 //services
 let TELEGRAM_ID = ''
 let bots: IBot[] = new Array
@@ -53,25 +79,28 @@ startBots().then(bot => {
     TELEGRAM_ID = bot.TELEGRAM_ID
     bots = bot.bots
   }).then(() => {
+    startSocket()
     startBotsListen()
-    startSocket()}
-  )
+  }).catch(error=>console.log('error', error)) // TODO: zmienić sposób obsługi błędu
 
-const waitingConnections: IWaitingConnections[] = new Array
+
 
 const startSocket = () => {
+    
     io.on("connection", (socket: Socket) => {
+
+    const waitingConnections: IWaitingConnections[] = new Array
     socket.on('message', (msg: string, id:string) => {
       let isFirstConnection = true
       for (let x in bots) {
         if (bots[x].clientId === id) {
           bots[x].bot.sendMessage(TELEGRAM_ID, msg)
-          bots[x].conversation.push({isUser: true, msg: msg, timestamp: new Date().getTime().toString()})
+          bots[x].conversation.push({isUser: true, msg: msg, timestamp: new Date().toLocaleString()})
           isFirstConnection = false
           break;
         }
       }
-      
+    
       if (isFirstConnection) {
         let isLinkedToBot = false;
         for(let x in bots) {
@@ -81,11 +110,11 @@ const startSocket = () => {
             bots[x].chatStartTime = new Date().toUTCString(),
             bots[x].bot.sendMessage(TELEGRAM_ID, "### New conversation ### ")
             bots[x].bot.sendMessage(TELEGRAM_ID, msg)
-            bots[x].conversation.push({isUser: true, msg: msg, timestamp: new Date().getTime().toString()})
+            bots[x].conversation.push({isUser: true, msg: msg, timestamp: new Date().toLocaleString()})
             isLinkedToBot = true
             break;
-          }
-        }
+        }}
+
         if (!isLinkedToBot) {
             let isWaiting = waitingConnections.find(el => el.id === id)
             if (isWaiting) {
@@ -93,7 +122,7 @@ const startSocket = () => {
             } else {
                 waitingConnections.push({id, msgs:[msg]})
                 io.to(id).emit('response', "Niestety czas oczekiwania na rozmowę może się przedłużyć... możesz zaczekać, albo zostawić nam swojego maila na którego na pewno odpowiemy")
-            }   
+            } 
         }
       }
     })
@@ -112,7 +141,7 @@ const startSocket = () => {
               let waitingClient = waitingConnections.shift() 
               if (!waitingClient) return
               bots[x].clientId = waitingClient.id
-              bots[x].bot.sendMessage(TELEGRAM_ID, "### User connected ###")
+              bots[x].bot.sendMessage(TELEGRAM_ID, "### New conversation ###")
               waitingClient.msgs.forEach(msg => bots[x].bot.sendMessage(TELEGRAM_ID, msg))
           } else {
             bots[x].isBusy = false;
@@ -125,45 +154,15 @@ const startSocket = () => {
 }
 
 const startBotsListen = () => {
-    bots[0].bot.on('message', ({text}:any) => {
+  for(let x in bots) {
+    bots[x].bot.on('message', ({text}:any) => {
       if (!text) return
-      bots[0].isBusy?
-      (io.to(bots[0].clientId).emit('response', text),
-      bots[0].conversation.push({isUser: false, msg: text, timestamp: new Date().getTime().toString()}))
+      bots[x].isBusy?
+      (io.to(bots[x].clientId).emit('response', text),
+      bots[x].conversation.push({isUser: false, msg: text, timestamp: new Date().toLocaleString()}))
       :null
     })
-
-    bots[1].bot.on('message', ({text}:any) => {
-      if (!text) return
-      bots[1].isBusy?
-      (io.to(bots[1].clientId).emit('response', text),
-      bots[1].conversation.push({isUser: false, msg: text, timestamp: new Date().getTime().toString()}))
-      :null
-    })
-
-    bots[2].bot.on('message', ({text}:any) => {
-      if (!text) return
-      bots[2].isBusy?
-      (io.to(bots[2].clientId).emit('response', text),
-      bots[2].conversation.push({isUser: false, msg: text, timestamp: new Date().getTime().toString()}))
-      :null
-    })
-
-    bots[3].bot.on('message', ({text}:any) => {
-      if (!text) return
-      bots[3].isBusy?
-      (io.to(bots[3].clientId).emit('response', text),
-      bots[3].conversation.push({isUser: false, msg: text, timestamp: new Date().getTime().toString()}))
-      :null
-    })
-
-    bots[4].bot.on('message', ({text}) => {
-      if (!text) return
-      bots[4].isBusy?
-      (io.to(bots[4].clientId).emit('response', text),
-      bots[4].conversation.push({isUser: false, msg: text, timestamp: new Date().getTime().toString()}))
-      :null
-    })
+  }
 }
   
-httpServer.listen(port, ()=>console.log(`listening on port${port}`));
+httpServer.listen(port);

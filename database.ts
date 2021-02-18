@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGOURL,
     useNewUrlParser: true,
     useUnifiedTopology: true
     },
-    // ()=> console.log("connected to MongoDB")
+    // ()=> console.log("connected to MongoDB") TODO dodać do sytemu logów
     )
 
 const chatSchema = new mongoose.Schema({
@@ -77,14 +77,16 @@ settingsSchema.statics.build = (args: ISettings) => {
 }
 
 
-
 export const SettingsModel = mongoose.model<any, SettingsModelInterface>('Settings', settingsSchema)
 export const ChatModel = mongoose.model<any, ChatModelInterface>('Chat', chatSchema)
-
 export const updateSettings = async (newSettings:ISettings) => {
-    const settings = await SettingsModel.findOne()
-    settings.overwrite(newSettings)
-    await settings.save()
+    try {
+        const settings = await SettingsModel.findOne()
+        settings.overwrite(newSettings)
+        await settings.save()}
+    catch (error) {
+        //do something 
+    }
 }
 
 

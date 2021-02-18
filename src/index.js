@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 const loginForm = document.getElementById('loginform')
 loginForm.addEventListener('submit', (event) => {
   if (loginForm.elements['login'].value === 'admin' &&
@@ -10,7 +8,7 @@ loginForm.addEventListener('submit', (event) => {
   }
   event.preventDefault()
 })
-
+const status = document.getElementById('status')
 const settingsForm = document.getElementById('settings')
 settingsForm.addEventListener('submit', (event)=> {
   let settings = {
@@ -29,8 +27,8 @@ settingsForm.addEventListener('submit', (event)=> {
         body: JSON.stringify(settings)
       }
     ).then((res)=> res.status==='200'?
-    document.getElementById('status').innerHTML('Zapisano w bazie danych'):
-    document.getElementById('status').innerHTML('Wystąpił błąd! Spróbuj ponownie!'));  
+    status.innerHTML('Zapisano w bazie danych'):
+    status.innerHTML('Wystąpił błąd! Spróbuj ponownie!'));  
   event.preventDefault()
 })
 
