@@ -1,44 +1,34 @@
 import TelegramBot from 'node-telegram-bot-api'
 import {SettingsModel} from './database'
-
-export interface IBot {
-    bot: TelegramBot,
-    isBusy: boolean,
-    clientId: string,
-    chatStartTime: string,
-    conversation: {
-        isUser: boolean,
-        msg: string,
-        timestamp: string,
-        }[]
-    }
+import {IBot} from './interfaces'
 
 export const startBots = async () => {
-    let TELEGRAM_ID = ''
     const bots: IBot[] = new Array
-    await SettingsModel.find().then((sets)=>{
-            TELEGRAM_ID = sets[0].telegram_id
-            bots.push({bot: new TelegramBot(sets[0].token_1, {polling: true}),
+    let TELEGRAM_ID = ''
+    console.log('dd')
+    await SettingsModel.findOne({isActive: true}).then((sets)=>{
+            TELEGRAM_ID = sets.telegram_id
+            bots.push({bot: new TelegramBot(sets.token_1, {polling: true}),
              isBusy: false,
              clientId: '',
              chatStartTime: '',
              conversation: []})
-            bots.push({bot: new TelegramBot(sets[0].token_2, {polling: true}),
+            bots.push({bot: new TelegramBot(sets.token_2, {polling: true}),
              isBusy: false,
              clientId: '',
              chatStartTime: '',
              conversation: []})
-            bots.push({bot: new TelegramBot(sets[0].token_3, {polling: true}),
+            bots.push({bot: new TelegramBot(sets.token_3, {polling: true}),
              isBusy: false,
              clientId: '',
              chatStartTime: '',
              conversation: []})
-            bots.push({bot: new TelegramBot(sets[0].token_4, {polling: true}),
+            bots.push({bot: new TelegramBot(sets.token_4, {polling: true}),
              isBusy: false,
              clientId: '',
              chatStartTime: '',
              conversation: []})
-            bots.push({bot: new TelegramBot(sets[0].token_5, {polling: true}),
+            bots.push({bot: new TelegramBot(sets.token_5, {polling: true}),
              isBusy: false,
              clientId: '',
              chatStartTime: '',
@@ -46,4 +36,3 @@ export const startBots = async () => {
         })
     return {bots, TELEGRAM_ID}
 }
-  
