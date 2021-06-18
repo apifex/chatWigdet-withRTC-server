@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  backend:
+    container_name: chatwidget_server
+    restart: always
+    image: :chatwidget_server:latest
+    ports: 
+      - 5000:5000
+    depends_on:
+      - mongo
+    networks:
+      - express-mongo
+  
+
+  mongo:
+    container_name: mongodb
+    restart: always
+    image: mongo:4.2.0
+    volumes:
+      - ./data:/data/db
+    networks:
+      - express-mongo
+networks:
+  express-mongo:
