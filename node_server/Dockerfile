@@ -9,7 +9,7 @@ WORKDIR /usr/src/app
 # Install Dependencies
 COPY package*.json ./
 
-# RUN npm start
+RUN npm install && npm install typescript
 
 # Copy app source code
 COPY . .

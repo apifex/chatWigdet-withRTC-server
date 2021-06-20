@@ -2,7 +2,7 @@ import { Document, Schema, model, Model }from 'mongoose'
   
 export interface IHistory {
     date: string;
-    conversations: {
+    conversation: {
       isUser: boolean, 
       msg: string,
       timestamp: string}[],
@@ -11,9 +11,6 @@ export interface IHistory {
 
 interface IHistoryDocument extends IHistory, Document {
     addOwner(): void,
-    addStep(stepId: string, position?: number): void,
-    editStepsPosition(stepId: string, position?: number): void,
-    generateJWT(): string,
 } 
 
 interface IHistoryModel extends Model<IHistoryDocument> {
@@ -25,7 +22,7 @@ const HistorySchema = new Schema<IHistoryDocument, IHistoryModel>({
       type: String,
       required: true,
     },
-    conversations: {
+    conversation: {
       type: Array,
     },
     owner: {

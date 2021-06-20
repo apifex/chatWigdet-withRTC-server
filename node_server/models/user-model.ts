@@ -12,13 +12,14 @@ interface IUser {
     createdOn?: Date,
     settings?: {
         telegramID: string,
-        telegramToken: string[]
+        telegramToken?: string[]
     }
+    history?: Map<string, string>
 }
 
 interface IUserDocument extends IUser, mongoose.Document {
     generateJWT(): string,
-    passwordToHash(): void,
+    passwordToHash(password: string): void,
     validatePassword(password: string): Promise<boolean>,
     getId(): Promise<string>,
 } 
@@ -54,7 +55,7 @@ const UserSchema = new mongoose.Schema<IUserDocument, IUserModel>({
     }
 })
 
-UserSchema.methods.validatePassword = async function (password) {
+UserSchema.methods.validatePassword = async function (password: string) {
     if (!this.salt || !this.hash) return
     const hash = crypto
         .pbkdf2Sync(password, this.salt, 128, 128, "sha512")
@@ -62,7 +63,7 @@ UserSchema.methods.validatePassword = async function (password) {
     return this.hash === hash
 }
 
-UserSchema.methods.passwordToHash = function (password) {
+UserSchema.methods.passwordToHash = function (password: string) {
     this.salt = crypto.randomBytes(16).toString("hex");
     this.hash = crypto
         .pbkdf2Sync(password, this.salt, 128, 128, "sha512")

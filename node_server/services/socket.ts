@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { Server, Socket } from "socket.io";
 import { TelegramBots } from "./telegramBots";
-import HistoryModel from "../models/history-model"
+import HistoryActions from "../controlers/history-controler"
 config()
 
 
@@ -17,8 +17,8 @@ export class socketServer {
         }>()
     waitingConnections: string[] = []
 
-    constructor (httpServer: Express.Application, tokens: string[]) {
-        this.bots = new TelegramBots(tokens)
+    constructor (httpServer: Express.Application, telegramID: string, tokens: string[]) {
+        this.bots = new TelegramBots(telegramID, tokens)
         this.io = new Server(httpServer, {cors: {origin: "*:*"}})
         this.listen()
     }
@@ -33,7 +33,7 @@ export class socketServer {
                         bot.history.push({
                             isUser: false,
                             msg: msg,
-                            timestamp: new Date().toLocaleString()
+                            timestamp: new Date().toTimeString()
                         })
                     }
                 } else {
@@ -44,12 +44,19 @@ export class socketServer {
                             history: [{
                                 isUser: false,
                                 msg: msg,
-                                timestamp: new Date().toLocaleString()
+                                timestamp: new Date().toTimeString()
                             }]
                         })
 
                         this.bots.listen(botID, (msg) => {
                             this.io.to(socket.id).emit('response', msg)
+                            this.activeConnections.get(socket.id)?.history.push(
+                                {
+                                    isUser: true,
+                                    msg: msg,
+                                    timestamp: new Date().toTimeString()
+                                }
+                            )
                         })
                         this.bots.sendMsg(botID, "New conversation")
                         this.bots.sendMsg(botID, msg)
@@ -62,15 +69,8 @@ export class socketServer {
             socket.on("disconnect", async () => {
                 const bot = this.activeConnections.get(socket.id)
                 if (!bot) throw new Error('no bot')
-                const history = await HistoryModel
-                .build({
-                    date: new Date().toLocaleString(),
-                    conversations: bot.history,
-                })
-                //TODO: add user integration
-                history.addOwner("admin")
-                await history.save()
-                this.bots.disconectBot(bot.botID)
+                HistoryActions.saveHistory(bot.history, this.bots.TELEGRAM_ID)
+                this.bots.disconnectBot(bot.botID)
                 this.activeConnections.delete(socket.id)
                     console.log("socket disconnect ")
                 });

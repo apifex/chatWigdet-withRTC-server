@@ -3,12 +3,13 @@ config()
 import express from 'express'
 import cors from 'cors'
 import {createServer} from 'http'
-import adminPageRouter from './routes/adminPageRouter'
+import adminPageRouter from './routes/adminRouter'
 import widgetRouter from './routes/widgetRouter'
 import { socketServer } from './services/socket'
 import { connectToDb } from './services/dbConnection'
 import UserModel from './models/user-model'
-
+import passport from 'passport'
+import { userErrorsHandler } from './services/errorHandler'
 
 const PORT = process.env.PORT || 5000
 
@@ -16,9 +17,15 @@ const server = express()
     server.use(cors())
     server.use(express.json())
     server.use(express.urlencoded({extended:true}))
+    server.use(passport.initialize())
+    server.use('/adminpage', adminPageRouter)
+    server.use('/widget', widgetRouter)
+    server.use(userErrorsHandler)
+//test
+    server.get('/test', (req, res) => {
+        console.log('server works - console')
+        res.send('server works')})
 
-    server.use('api/adminpage', adminPageRouter)
-    server.use('api/widget', widgetRouter)
 
 const httpServer = createServer(server)
 
@@ -27,12 +34,13 @@ let reconnect:number = 0
 async function start () {
     try {
         const connection = await connectToDb()
-        if (true) {
-            // const settings = await UserModel.findById('tttttttttttt').exec()
-            // const tokens = settings?.settings?.telegramToken
-            const tokens = ['1509109378:AAE5h9aOcEIo0eWs1GURuexEZDzAZuHekZI', '1557883696:AAH1XOAar_gyAfPVHy03qMMPwH_Nv_6hr1Y', '1580846601:AAFXUAq7YTkW_Rl_I4pyNF99bERZCK2iomQ']
-            if (!tokens) throw Error('no tokens found in settings')
-            new socketServer(httpServer, tokens)
+        if (connection) {
+            const settings = await UserModel.findOne({email: process.env.USER}).exec()
+            const telegramId = settings?.settings?.telegramID
+            const tokens = settings?.settings?.telegramToken
+            if (!tokens || !telegramId) throw Error('no tokens found in settings')
+            new socketServer(httpServer, telegramId, tokens)
+            httpServer.listen(PORT, ()=> console.log(`Socket listening on ${PORT}`))
         } else {
             if (reconnect<3) {start(); reconnect++} 
             else console.log('Not possible to connect to database. Server stoped')
@@ -40,16 +48,10 @@ async function start () {
     } catch(error) {
         console.log(error)
         throw Error()
-        
     }
     
 }
 
 start()
-
-//test
-    server.get('/test', (req, res) => {
-        console.log('server works - console')
-        res.send('server works')})
     
-httpServer.listen(PORT, ()=> console.log(`Listening on ${PORT}`))
+    
