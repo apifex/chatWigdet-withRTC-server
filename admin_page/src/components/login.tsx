@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {MouseEvent, useState, useContext} from 'react';
+import { useHistory } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -7,24 +8,16 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import serverActions from '../services/serverActions';
+import {UserContext} from '../services/userContext'
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -38,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
+    width: '100%',
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -46,8 +39,48 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+const useSignIn = () => {
   const classes = useStyles();
+  const {t} = useTranslation()
+  const [credentials, setCredentials] = useState({
+                                            email: '',
+                                            password: '',
+                                          })
+  const userContext = useContext(UserContext)
+  const history = useHistory();
+  const [inputError, setInputError] = useState<{email: string | null, password: string | null}>({
+    email: null,
+    password: null
+  })
+
+  const handleInput = (e: React.ChangeEvent) => {
+    const event = (e.currentTarget as HTMLInputElement)
+    setInputError({...inputError, [event.id]: null})
+    setCredentials({...credentials, [event.id]: event.value})
+  }
+
+  useEffect(()=>{
+    if (userContext?.user) history.push('/settings')
+  })
+
+  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    const user = await serverActions.login(credentials.email, credentials.password)
+    if (user.status==='error') {
+      if (user.message.includes('email')) setInputError({...inputError, email: user.message})
+      if (user.message.includes('password')) setInputError({...inputError, password: user.message})
+      return
+    }
+    if (userContext) userContext.setUser(user)
+    history.push("/settings");
+  }
+
+  return {t, classes, handleInput, handleSubmit, inputError}
+}
+
+
+const SignIn = () => {
+  const {t, classes, handleInput, handleSubmit, inputError} = useSignIn()
 
   return (
     <Container component="main" maxWidth="xs">
@@ -57,10 +90,11 @@ export default function SignIn() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
+            error={inputError.email?true:false}
             variant="outlined"
             margin="normal"
             required
@@ -68,10 +102,13 @@ export default function SignIn() {
             id="email"
             label="Email Address"
             name="email"
+            onChange={handleInput}
+            helperText={inputError.email}
             autoComplete="email"
             autoFocus
           />
           <TextField
+            error={inputError.password?true:false}
             variant="outlined"
             margin="normal"
             required
@@ -80,6 +117,8 @@ export default function SignIn() {
             label="Password"
             type="password"
             id="password"
+            onChange={handleInput}
+            helperText={inputError.password}
             autoComplete="current-password"
           />
           <FormControlLabel
@@ -92,8 +131,9 @@ export default function SignIn() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={handleSubmit}
           >
-            Sign In
+            {t('Log In')}
           </Button>
           <Grid container>
             <Grid item xs>
@@ -101,13 +141,11 @@ export default function SignIn() {
                 Forgot password?
               </Link>
             </Grid>
-            
           </Grid>
         </form>
       </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
 }
+
+export default SignIn

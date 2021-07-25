@@ -15,7 +15,11 @@ const resources = {
             "Cancel" : "Cancel",
             "History" : "History",
             "Contact" : "Contact",
-            "Log out" : "Log out"
+            "Log out" : "Log out",
+            "Log in" : "Log in",
+            "Add Telegram Token" : "Add Telegram Token",
+            "Account" : "Account",
+            "No conversations in history" : "No conversations in history",
         }
     },
     fr: {
@@ -31,7 +35,11 @@ const resources = {
             "Cancel" : "Abandonner",
             "History" : "Histoire",
             "Contact" : "Contact",
-            "Log out" : "Se déconnecter"
+            "Log in" : "Se connecter",
+            "Log out" : "Se déconnecter",
+            "Add Telegram Token" : "Ajoute Telegram Token",
+            "Account" : "Compte",
+            "No conversations in history" : "Pas de conversation dans l'histoire",
         },
     },
     pl: {
@@ -47,11 +55,13 @@ const resources = {
             "Cancel" : "Wyjdź",
             "History" : "Historia",
             "Contact" : "Kontakt",
-            "Log out" : "Wyloguj"
+            "Log in" : "Zaloguj",
+            "Log out" : "Wyloguj",
+            "Add Telegram Token" : "Dodaj Telegram Token",
+            "Account" : "Konto",
+            "No conversations in history" : "Brak rozmow w historii",
         }
-    
     }
-    
 }
 
 i18n.use(initReactI18next)

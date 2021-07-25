@@ -1,68 +1,53 @@
-import React, {useState, useContext, Context, useEffect} from 'react'
-import HistoryContext from './HistoryContext'
 import './App.scss';
-import './i18n'
+import './services/i18n'
+import { Route, Router, Switch } from 'react-router-dom';
 import SignIn from '../src/components/login'
-import NavBar from './components/appbar'
-import SettingsList from './components/settingslist';
-import History from './components/history'
-import Chat from './components/chat'
-import Grid from '@material-ui/core/Grid'
-import ServerActions from './serverActions'
+import NavBar from './components/navbar'
+import Tabs from './components/tabs'
+import { browserHistory } from './services/browserHistory';
+import {UserContextProvider} from './services/userContext'
+import AuthorizedComponent from './components/authorized';
+import Box from '@material-ui/core/Box';
+import Copyright from './components/copyright';
+import Container from '@material-ui/core/Container';
+import useStyles from './services/styles'
 
-const useAdmin = () => {
-  
-  const [history, setHistory] = useState([{
-    _id: '', 
-    chatID: '',
-    conversation: [{
-            isUser: true,
-            msg: '',
-            timestamp: ''
-        }]
-  }])
-  const [chatId, setChatId] = useState('')
-  console.log(chatId, 'hello')
-  const [chatToDisplay, setChatToDisplay] = useState([{
-    isUser: true,
-    msg: '',
-    timestamp: ''
-}])
-const takechat = (id: string) => {
-  let index = history.findIndex(el=> el._id ===id)
-  setChatToDisplay(history[index].conversation)
-}
-console.log(chatId, 'a tutaj')
-  // setChatToDisplay(history[history.findIndex(el=>el._id === chatId)].conversation)
-  return {takechat, history, setHistory, chatId, setChatId, chatToDisplay, setChatToDisplay}
-}
 
-function AdminPage() {
-  const {takechat, history, setHistory, chatId, setChatId, chatToDisplay, setChatToDisplay} = useAdmin()
-
-  useEffect(()=>{
-    ServerActions.getChat().then(chats=>setHistory(chats))
-  }, [])
+export default function AdminPage() {
+  const classes = useStyles();
 
   return (
-    <div className="AdminPage">
-      {/* <HistoryContext.Provider value={{history: history, setHistoryContext: setHistory, chatToDisplay: chatToDisplay, setChatToDisplay: setChatToDisplay}}> */}
-      <SignIn/>
+    <UserContextProvider>
+    <Router history={browserHistory}>
       <NavBar/>
-      <Grid
-        container
-        direction="row"
-        justify="center"
-        alignItems="flex-start"
-        spacing={3}>
-      <SettingsList />
-      <History history={history} setChat={takechat}/>
-      <Chat chat={chatToDisplay} />
-      </Grid>
-      {/* </HistoryContext.Provider> */}
-    </div>
-    
+      <Container className={classes.paper} component="main" maxWidth="xl">
+        <Switch>
+        <Route exact path='/login'>
+          <SignIn />
+        </Route>
+          <AuthorizedComponent>
+            <Route exact path='/'>
+              <Tabs openTab={0} />
+            </Route>
+            <Route path='/settings'>
+              <Tabs openTab={0} />
+            </Route>
+            <Route path='/history'>
+              <Tabs openTab={1} />
+            </Route>
+            <Route path='/stats'>
+              <Tabs openTab={2} />
+            </Route>
+            <Route path='/account'>
+              <Tabs openTab={3} />
+            </Route>
+          </AuthorizedComponent>
+        </Switch>
+        </Container>
+      <Box mt={8}>
+        <Copyright />
+      </Box>
+    </Router>
+    </UserContextProvider>
   );
 }
-
-export default AdminPage;

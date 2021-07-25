@@ -1,67 +1,68 @@
-import React, {useEffect, useState, useContext, useCallback} from 'react'
-import { useTranslation } from 'react-i18next'
-import Grid from '@material-ui/core/Grid'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
-import DeleteIcon from '@material-ui/icons/Delete';
-import {useStyles} from '../styles'
+import React, { useState, useEffect} from 'react';
+import serverActions from '../services/serverActions';
+import { useMediaQuery } from 'react-responsive';
+import {useTranslation} from 'react-i18next'
+import useStyles from '../services/styles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import TabPanel from './tabpanel'
+import Conversation from './conversation'
 
-import HistoryContext from '../HistoryContext'
+const useHistory = () => {
+  const classes = useStyles();
+  const {t} = useTranslation()
+  const [conversationID, setConversationID] = useState<string | null | undefined>();
+  const [history, setHistory] = useState([{id: '', date: ''}])
+  const [value, setValue] = useState(0);
 
+  const isMobile = useMediaQuery({ query: '(max-width: 768px)' })
 
-// const useHistory = () => {
-//   const setChat = useContext(HistoryContext).setChatToDisplay
-//   const handleClick = useCallback((ev:any) => {
-//     console.log('handle clik value', ev.currentTarget.id)
-//     setChat(ev.currentTarget.id)
-//   }, [])
-//   return {handleClick}
-// }
+  const getHistory = async () => {
+    const historyList = await serverActions.getHistory()
+    if (historyList) setHistory(historyList)
+  }
 
-interface IProps {
-  history: IHistory[],
-  setChat: (id:string) => void ,
-}
-
-const History = (history: IProps) => {
-  const { t } = useTranslation()
-  const classes = useStyles()
-  // const history = useContext(HistoryContext).history
-  // const {handleClick} = useHistory()
-  const handleClick = useCallback((ev:any) => {
-    console.log('handle clik value', ev.currentTarget.id)
-    history.setChat(ev.currentTarget.id)
+  useEffect(()=>{
+    getHistory()
   }, [])
-  
-  
 
-    return(
-      <Grid item xs={12} md={6} lg={4}>
-        <Paper className={classes.paper}>
-        <Typography variant="h4">{t("History")}</Typography>
-          <List>
-            {
-            history.history.map((chat:any)=>
-              <ListItem button id={chat._id} onClick={handleClick} >
-                {console.log('here', chat)}
-                <ListItemText primary={chat.chatID}/>
-                <ListItemSecondaryAction>
-                  <DeleteIcon className={classes.delete} onClick={()=>console.log('delete')}/>
-                </ListItemSecondaryAction>
-              </ListItem>
-          
-            )
-            }
-          </List>
-        </Paper>
-        
-      </Grid>
-      
-    )
+  useEffect(()=>{
+    setConversationID(history[0].id)
+  }, [history])
+
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
+    const e = (event.currentTarget as HTMLButtonElement).id
+    setConversationID(e);
+  }; 
+
+  return {t, classes, conversationID, history, value, isMobile, handleChange}
 }
 
-export default History
+
+export default function VerticalTabs() {
+        const {t, classes, conversationID, history, value, isMobile, handleChange} = useHistory()
+    
+    return (
+      <div className={isMobile?classes.rootMobile:classes.root}>
+        <Tabs
+          orientation="vertical"
+          indicatorColor="primary"
+          variant="scrollable"
+          value={value}
+          onChange={handleChange}
+          aria-label="Vertical tabs"
+          className={isMobile?classes.tabsMobile:classes.tabs}
+        >
+          {history.length===0
+          ?<Tab label={t('No conversations in history')} id='empty' />
+          :history.map(el => <Tab label={el.date} key={el.id} id={el.id} />)}
+        </Tabs>
+        {conversationID?
+          <TabPanel >
+            <Conversation conversationID={conversationID}/>
+          </TabPanel >:null}
+      </div>
+    );
+  }
+  

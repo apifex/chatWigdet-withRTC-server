@@ -1,165 +1,107 @@
-import React from 'react'
+import React, {useCallback, useState, useEffect} from 'react'
 import { useTranslation } from 'react-i18next'
-import {useFormik} from 'formik'
+import serverActions from '../services/serverActions'
+import useStyles from '../services/styles';
 import TextField from '@material-ui/core/TextField'
+import Paper from '@material-ui/core/Paper'
 import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
+import IconButton from '@material-ui/core/IconButton'
+import InputAdornment from '@material-ui/core/InputAdornment'
 import CloseIcon from "@material-ui/icons/Close"
 import SaveIcon from '@material-ui/icons/Save'
-import {useStyles} from '../styles'
+import TelegramIcon from '@material-ui/icons/Telegram'
+import CardActions from '@material-ui/core/CardActions';
 
-interface IProps {
-  isOpen: boolean
-  closeEdit: ()=>void
-}
-
-const Settings = ({isOpen, closeEdit}: IProps) => {
-         
-    const classes = useStyles()
-    const { t } = useTranslation()
-    const formik = useFormik({
-      initialValues: {
-        telegram_id: "fsadf",
-        token1: "",
-        token2: "",
-        token3: "",
-        token4: "",
-        token5: "",
-        whatsappNumber: "",
-        telegramUsername: ""
-      },
-      onSubmit: values => {
-        alert(JSON.stringify(values, null, 2))
-      }
+const useSetting = () => {
+  const {t} = useTranslation()
+  const classes = useStyles()
+  const [settings, setSettings] = useState({
+      telegramID: '',
+      telegramToken: [''],
+      whatsappNumber: '',
+      telegramNumber: '',
     })
 
-    const handleSubmit = () => {console.log('submit')
-      formik.handleSubmit()
+  const getSettings = useCallback(async () => {
+    const settings = await serverActions.getSettings()
+    if (settings) setSettings(settings)
+  },[])
+
+    useEffect(()=>{
+      getSettings()
+    }, [getSettings])
+
+
+    const handleChange = (e: React.ChangeEvent) => {
+      const event = (e.currentTarget as HTMLInputElement)
+      if (event.id.includes('Token')) {
+        const arr = [...settings.telegramToken]
+        arr[Number(event.id[event.id.length-1])] = event.value
+        setSettings({...settings, telegramToken: arr})
+      } else {
+        setSettings({...settings, [event.id]: event.value})
+      } 
+    }
+
+    const handleClick = (e: React.MouseEvent) => {
+      if (e.currentTarget.id==='addTelegram') {
+        const arr = [...settings.telegramToken]
+        arr.push('')
+        setSettings({...settings, telegramToken: arr})
       }
-    
+      if (e.currentTarget.id.includes('token')) {
+        const arr = [...settings.telegramToken]
+        arr.splice(Number(e.currentTarget.id[e.currentTarget.id.length-1]), 1)
+        setSettings({...settings, telegramToken: arr})
+      }
+      if (e.currentTarget.id==='save') {
+        serverActions.addSettings(settings)
+        //TODO return information
+      }
+    }
+  return {t, classes, settings, handleClick, handleChange}
+}
+
+const Settings = () => {
+    const {t, classes, settings, handleClick, handleChange} = useSetting()
+
     return(
-        
-          <Dialog open={isOpen} onClose={closeEdit} aria-labelledby="form-dialog-title">
-          <DialogTitle>Ustawienia nr 
-          </DialogTitle>
-          <DialogContent>
-            <TextField
-                id='telegram_id' 
-                name="telegram_id" 
-                label="Telegram ID" 
-                fullWidth
-                style={{margin: 7}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.telegram_id} 
-                variant="outlined"/>
-            <TextField
-                id='token1' 
-                name="token1" 
-                label="Telegram Token 1"
-                fullWidth
-                style={{margin: 7}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.token1} 
-                variant="outlined"/>
-              <TextField 
-                className={classes.input} 
-                id='token2' 
-                name="token2" 
-                label="Telegram Token 2" 
-                fullWidth
-                style={{margin: 7}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.token2} 
-                variant="outlined"/>
-              <TextField 
-                className={classes.input} 
-                id='token3' 
-                name="token3" 
-                label="Telegram Token 3" 
-                fullWidth
-                style={{margin: 7}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.token3} 
-                variant="outlined"/>
-              <TextField 
-                className={classes.input} 
-                id='token4' 
-                name="token4" 
-                label="Telegram Token 4" 
-                fullWidth
-                style={{margin: 7}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.token4} 
-                variant="outlined"/>
-              <TextField 
-                className={classes.input} 
-                id='token5' 
-                name="token5" 
-                label="Telegram Token 5" 
-                fullWidth
-                style={{margin: 7}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.token5} 
-                variant="outlined"/>
-              <TextField 
-                className={classes.input} 
-                id='whatsappNumber' 
-                name="whatsappNumber" 
-                label={t("Phone number assotiated with Whatsapp")}
-                fullWidth
-                style={{margin: 7}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.whatsappNumber} 
-                variant="outlined"/>
-              <TextField 
-                className={classes.input} 
-                id='telegramUsername' 
-                name="telegramUsername" 
-                label={t("Telegram's username")}
-                fullWidth
-                style={{margin: 6}} 
-                size="small"
-                onChange={formik.handleChange} 
-                value={formik.values.telegramUsername} 
-                variant="outlined"/>
-            
-            <DialogActions>
-            <Button 
-              style={{margin: 'auto'}}
-              variant="contained" 
-              onClick={handleSubmit} 
-              color="primary" 
-              size="small"
-              startIcon={<SaveIcon/>}>{t("Save")}</Button>
-            <Button 
-              style={{margin: 'auto'}}
-              variant="contained" 
-              onClick={handleSubmit} 
-              color="secondary" 
-              size="small"
-              startIcon={<SaveIcon/>}>{t("Save and Activate")}</Button>
-            <Button 
-              style={{margin: 'auto'}}
-              variant="contained" 
-              onClick={handleSubmit} 
-              color="primary" 
-              size="small"
-              startIcon={<CloseIcon/>}>{t("Cancel")}</Button>
-            </DialogActions>
-            </DialogContent>
-          </Dialog>
-        
-        
+      <div className={classes.root}>
+      <Paper elevation={0}>
+         <CardActions>
+           <Button id='save' onClick={handleClick}>{t('Save')}
+            <SaveIcon/>
+           </Button>
+         </CardActions>
+         <TextField className={classes.input} label='telegram ID' id='telegramID' required value={settings.telegramID} variant="outlined" onChange={handleChange}/>
+         <TextField className={classes.input} label='Telegram Number' id='telegramNumber' variant="outlined" value={settings.telegramNumber} onChange={handleChange}/>
+         <TextField className={classes.input} label='Whatsapp Number' id='whatsappNumber' variant="outlined" value={settings.whatsappNumber} onChange={handleChange}/>
+        {settings.telegramToken.map((token, index)=> {
+           return  <TextField 
+           key={index}
+           className={classes.input} 
+           label={'telegram Token ' + (index+1)} 
+           id={'telegramToken ' + index} 
+           value={settings.telegramToken[index]} 
+           variant="outlined" 
+           onChange={handleChange}
+           InputProps={{
+            endAdornment: (
+              <InputAdornment position='end'>
+                <IconButton id={'token'+index} onClick={handleClick}>
+                  <CloseIcon/>
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}/>
+         })}
+         <CardActions>
+           <Button id='addTelegram' onClick={handleClick} >
+             <TelegramIcon/>{t('Add Telegram Token')}
+           </Button>
+         </CardActions>
+      </Paper>
+      </div>
     )
 }
 
