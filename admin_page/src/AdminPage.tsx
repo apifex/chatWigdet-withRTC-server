@@ -1,21 +1,22 @@
 import './App.scss';
 import './services/i18n'
 import { Route, Router, Switch } from 'react-router-dom';
-import SignIn from '../src/components/login'
-import NavBar from './components/navbar'
-import Tabs from './components/tabs'
 import { browserHistory } from './services/browserHistory';
 import {UserContextProvider} from './services/userContext'
+
+import SignIn from '../src/components/login'
 import AuthorizedComponent from './components/authorized';
+import NavBar from './components/navbar'
+import Tabs from './components/tabs'
 import Box from '@material-ui/core/Box';
 import Copyright from './components/copyright';
 import Container from '@material-ui/core/Container';
-import useStyles from './services/styles'
+import {useStyles} from './services/styles'
+
 
 
 export default function AdminPage() {
   const classes = useStyles();
-
   return (
     <UserContextProvider>
     <Router history={browserHistory}>

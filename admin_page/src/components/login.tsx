@@ -1,4 +1,4 @@
-import React, {MouseEvent, useState, useContext} from 'react';
+import React, { MouseEvent, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -13,11 +13,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import serverActions from '../services/serverActions';
-import {UserContext} from '../services/userContext'
+import { UserContext } from '../services/userContext'
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-
-
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -41,46 +39,45 @@ const useStyles = makeStyles((theme) => ({
 
 const useSignIn = () => {
   const classes = useStyles();
-  const {t} = useTranslation()
+  const { t } = useTranslation()
   const [credentials, setCredentials] = useState({
-                                            email: '',
-                                            password: '',
-                                          })
+    email: '',
+    password: '',
+  })
   const userContext = useContext(UserContext)
   const history = useHistory();
-  const [inputError, setInputError] = useState<{email: string | null, password: string | null}>({
+  const [inputError, setInputError] = useState<{ email: string | null, password: string | null }>({
     email: null,
     password: null
   })
 
   const handleInput = (e: React.ChangeEvent) => {
     const event = (e.currentTarget as HTMLInputElement)
-    setInputError({...inputError, [event.id]: null})
-    setCredentials({...credentials, [event.id]: event.value})
+    setInputError({ ...inputError, [event.id]: null })
+    setCredentials({ ...credentials, [event.id]: event.value })
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     if (userContext?.user) history.push('/settings')
   })
 
   const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     const user = await serverActions.login(credentials.email, credentials.password)
-    if (user.status==='error') {
-      if (user.message.includes('email')) setInputError({...inputError, email: user.message})
-      if (user.message.includes('password')) setInputError({...inputError, password: user.message})
+    if (user.status === 'error') {
+      if (user.message.includes('email')) setInputError({ ...inputError, email: user.message })
+      if (user.message.includes('password')) setInputError({ ...inputError, password: user.message })
       return
     }
     if (userContext) userContext.setUser(user)
     history.push("/settings");
   }
 
-  return {t, classes, handleInput, handleSubmit, inputError}
+  return { t, classes, handleInput, handleSubmit, inputError }
 }
 
-
 const SignIn = () => {
-  const {t, classes, handleInput, handleSubmit, inputError} = useSignIn()
+  const { t, classes, handleInput, handleSubmit, inputError } = useSignIn()
 
   return (
     <Container component="main" maxWidth="xs">
@@ -90,11 +87,11 @@ const SignIn = () => {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          
+
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
-            error={inputError.email?true:false}
+            error={inputError.email ? true : false}
             variant="outlined"
             margin="normal"
             required
@@ -108,7 +105,7 @@ const SignIn = () => {
             autoFocus
           />
           <TextField
-            error={inputError.password?true:false}
+            error={inputError.password ? true : false}
             variant="outlined"
             margin="normal"
             required

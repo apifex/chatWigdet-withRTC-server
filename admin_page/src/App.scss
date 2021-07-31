@@ -54,8 +54,6 @@ body {
 
 .container {
   width: auto;
-	// padding:30px;
-	// margin:20px;
 	background: #FFF;
 	border-radius: 10px;
 	-webkit-border-radius:10px;
@@ -71,7 +69,6 @@ Messages
 .messages {
   flex: 1 1 auto;
   overflow-y: auto;
-  // position: relative;
   width: 90%;
   padding: 10px;
 
@@ -103,4 +100,10 @@ Messages
       }
     }
   } 
+}
+.timestamp {
+  margin-top: 5px;
+  font-size: 10px;
+  float: right;
+  font-style: italic;
 }

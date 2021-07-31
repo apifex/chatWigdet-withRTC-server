@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import serverActions from '../services/serverActions';
-import useStyles from '../services/styles'
 import Card from '@material-ui/core/Card'
+import {useStyles} from '../services/styles'
 
   interface IMessage {
     isUser: boolean,
     msg: string,
-    timestamp: string
+    timestamp: Date
   }
   
   interface IProps {
@@ -14,7 +14,6 @@ import Card from '@material-ui/core/Card'
   }
 
   interface IConversation {
-    date: string,
     conversation: IMessage[]
   }
 
@@ -43,15 +42,17 @@ import Card from '@material-ui/core/Card'
             <div className='messages'>
             {conversation.conversation.map((message: IMessage)=>
               message.isUser?
-              <div key={message.timestamp}
+              <div key={message.timestamp.toString()}
                   id={message.msg}
                   className='message message-personal'>
                   {message.msg}
+                  <span className='timestamp'><br/>{new Date(message.timestamp).toLocaleTimeString()}</span>
               </div>
               :
-              <div key={message.timestamp} 
+              <div key={message.timestamp.toString()} 
                   className='message'>
-                  {message.msg}
+                  {message.msg} <br/>
+                  <span className='timestamp'>{new Date(message.timestamp).toLocaleTimeString()}</span>
               </div>
               )
               }

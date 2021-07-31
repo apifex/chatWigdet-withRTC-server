@@ -2,11 +2,11 @@ import React, { useState, useEffect} from 'react';
 import serverActions from '../services/serverActions';
 import { useMediaQuery } from 'react-responsive';
 import {useTranslation} from 'react-i18next'
-import useStyles from '../services/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import TabPanel from './tabpanel'
 import Conversation from './conversation'
+import {useStyles} from '../services/styles';
 
 const useHistory = () => {
   const classes = useStyles();
@@ -56,7 +56,7 @@ export default function VerticalTabs() {
         >
           {history.length===0
           ?<Tab label={t('No conversations in history')} id='empty' />
-          :history.map(el => <Tab label={el.date} key={el.id} id={el.id} />)}
+          :history.map(el => <Tab label={new Date(el.date).toLocaleString()} key={el.id} id={el.id} />)}
         </Tabs>
         {conversationID?
           <TabPanel >
