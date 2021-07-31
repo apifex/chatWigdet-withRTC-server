@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { Strategy } from 'passport-local'
 import UserModel from '../../models/user-model'
+import Logger from '../logger';
 
 const authFields = {
     usernameField: 'email',
@@ -14,14 +15,14 @@ passport.use("login",
       authFields, async (req, username, password, done) => {
         try {
           const user = await UserModel.findOne({email: username})
-          if (!user) throw new Error('No found user')
+          if (!user) throw new Error('Invalid email')
           const validatePassword = await user.validatePassword(password)
           if (!validatePassword) {
-            throw new Error('Invalid user or password')
+            throw new Error('Invalid password')
           }
           return done(null, user)          
-        } catch (error) {
-          return done(error)
+        } catch (err) {
+          return done(err, false, {message: err.message} )
         }
       }
   ) 

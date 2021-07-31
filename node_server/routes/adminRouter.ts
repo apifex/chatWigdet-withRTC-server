@@ -25,10 +25,12 @@ adminRouter.get('/getsettings', passport.authenticate('jwt', {session: false}), 
 
 adminRouter.post('/editsettings', passport.authenticate('jwt', {session: false}), UserActions.editSettings)
 
+adminRouter.get('/getstats', passport.authenticate('jwt', {session: false}), UserActions.getStats)
+
+adminRouter.get('/getconversation', passport.authenticate('jwt', {session: false}), HistoryActions.getConversation)
+
 adminRouter.get('/gethistory', passport.authenticate('jwt', {session: false}), HistoryActions.getHistory)
 
-adminRouter.get('/gethistorylist', passport.authenticate('jwt', {session: false}), HistoryActions.getHistoryList)
-
-adminRouter.post('/deletehistory', passport.authenticate('jwt', {session: false}), HistoryActions.deleteHistory)
+adminRouter.post('/deleteconversation', passport.authenticate('jwt', {session: false}), HistoryActions.deleteConversation)
 
 export default adminRouter;

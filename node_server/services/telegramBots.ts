@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import TelegramBot from 'node-telegram-bot-api'
+import Logger from './logger';
 
 config()
 
@@ -14,9 +15,9 @@ export class TelegramBots {
     }
 
     async initializeBots (tokens: string[]) {
-        console.log('\x1b[32m','initializing bots ...')
+        Logger.debug('initializing bots ...')
         for (const token of tokens) {
-            const bot = new TelegramBot(token, {polling: true})
+            const bot = new TelegramBot(token, {polling: true,})
             this.bots.push(bot)
         }
     }

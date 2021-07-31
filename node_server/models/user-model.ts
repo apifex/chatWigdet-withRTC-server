@@ -12,7 +12,9 @@ interface IUser {
     createdOn?: Date,
     settings?: {
         telegramID: string,
-        telegramToken?: string[]
+        telegramToken?: string[],
+        whatsappNumber?: string,
+        telegramNumber?: string,
     }
     history?: Map<string, string>
 }

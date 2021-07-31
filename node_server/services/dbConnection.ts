@@ -1,10 +1,11 @@
 import mongoose from 'mongoose'
+import Logger from './logger'
 
 const connectionString =  process.env.MONGOURL
 
 export const connectToDb = async () => {
     try {
-        console.log('connecting to database ...')
+        Logger.debug('connecting to database ...')
         await mongoose.connect(connectionString, 
             {useCreateIndex: true,
             useNewUrlParser: true,
@@ -12,7 +13,7 @@ export const connectToDb = async () => {
             })
         return true
     } catch (error) {
-        console.log('Error when connecting to database')
+        Logger.error('Error on conncetion to database')
         return false
     }
 }
